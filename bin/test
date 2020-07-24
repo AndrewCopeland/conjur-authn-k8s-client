@@ -15,11 +15,21 @@ docker build -f Dockerfile.test -t conjur-authn-k8s-client-test-runner:latest .
 
 echo "Running unit tests..."
 set +e
-  docker run --rm -t conjur-authn-k8s-client-test-runner:latest \
+  docker run --rm \
+             -v $PWD/test:/test \
+             -t conjur-authn-k8s-client-test-runner:latest \
              ./cmd/... \
              ./pkg/... \
              | tee -a "$junit_output_file"
   echo "Unit test exit status: $?"
+
+  docker run --rm \
+             -v $PWD/test:/test \
+             -v $PWD:/workspace \
+             -t conjur-authn-k8s-client-test-runner:latest \
+             --entrypoint /bin/bash \
+             --workdir /workspace \
+             -exc "gocov convert ./c.out | gocov-xml > /test/coverage.xml"
 set -e
 
 rm -f junit.xml
@@ -34,5 +44,5 @@ docker run --rm \
   -v $PWD/test:/test \
   conjur-authn-k8s-client-junit:latest \
   bash -exc "
-    cat ./junit.output | go-junit-report > ./junit.xml
+    cat ./junit.output | go-junit-report > ./junit.xml;
   "
