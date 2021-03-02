@@ -10,12 +10,12 @@ import (
 )
 
 // AuthenticateRequest sends an authenticate request
-func AuthenticateRequest(authnURL string, account string, username string, sessionToken []byte) (*http.Request, error) {
+func AuthenticateRequest(applianceURL string, account string, sessionToken []byte) (*http.Request, error) {
 	var authenticateURL string
 	var err error
 	var req *http.Request
 
-	authenticateURL = fmt.Sprintf("%s/%s/%s/authenticate", authnURL, account, url.QueryEscape(username))
+	authenticateURL = fmt.Sprintf("%s/authn-gcp/%s/authenticate", applianceURL, account)
 	log.Debug(log.CAKC046, authenticateURL)
 
 	body := strings.NewReader(fmt.Sprintf("jwt=%s", string(sessionToken)))

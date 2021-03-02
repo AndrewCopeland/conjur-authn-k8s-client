@@ -30,7 +30,7 @@ const (
 )
 
 var requiredEnvVariables = []string{
-	"CONJUR_AUTHN_URL",
+	"CONJUR_APPLIANCE_URL",
 	"CONJUR_ACCOUNT",
 	"CONJUR_AUTHN_LOGIN",
 }
@@ -73,7 +73,7 @@ func populateConfig() (*Config, error) {
 	config := &Config{
 		Account:       os.Getenv("CONJUR_ACCOUNT"),
 		ContainerMode: os.Getenv("CONTAINER_MODE"),
-		URL:           os.Getenv("CONJUR_AUTHN_URL"),
+		URL:           os.Getenv("CONJUR_APPLIANCE_URL"),
 		Username:      os.Getenv("CONJUR_AUTHN_LOGIN"),
 	}
 

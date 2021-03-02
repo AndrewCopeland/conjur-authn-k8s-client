@@ -80,7 +80,6 @@ func (auth *Authenticator) sendAuthenticationRequest(sessionToken []byte) ([]byt
 	req, err := AuthenticateRequest(
 		auth.Config.URL,
 		auth.Config.Account,
-		auth.Config.Username,
 		sessionToken,
 	)
 	if err != nil {
