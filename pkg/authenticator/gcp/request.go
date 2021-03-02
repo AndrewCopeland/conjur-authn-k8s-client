@@ -36,8 +36,8 @@ func MetadataRequest(account string, username string) (*http.Request, error) {
 	var req *http.Request
 
 	metadataIdentityURL := "http://metadata/computeMetadata/v1/instance/service-accounts/default/identity"
-
-	metadataURL := fmt.Sprintf("%s?audience=conjur/%s/%s&format=full", metadataIdentityURL, account, url.QueryEscape(username))
+	audience := url.QueryEscape(fmt.Sprintf("conjur/%s/%s", account, username))
+	metadataURL := fmt.Sprintf("%s?audience=%s&format=full", metadataIdentityURL, audience)
 	log.Debug(log.CAKC046, metadataURL)
 
 	if req, err = http.NewRequest("GET", metadataIdentityURL, nil); err != nil {
