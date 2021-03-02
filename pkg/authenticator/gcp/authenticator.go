@@ -3,6 +3,8 @@ package gcp
 import (
 	"crypto/x509"
 	"net/http"
+	"os"
+	"strings"
 
 	"github.com/cyberark/conjur-authn-k8s-client/pkg/access_token"
 	"github.com/cyberark/conjur-authn-k8s-client/pkg/access_token/file"
@@ -77,10 +79,13 @@ func (auth *Authenticator) sendAuthenticationRequest(sessionToken []byte) ([]byt
 		return nil, err
 	}
 
+	base64Token := strings.ToLower(os.Getenv("CONJUR_BASE64_TOKEN")) == "true"
+
 	req, err := AuthenticateRequest(
 		auth.Config.URL,
 		auth.Config.Account,
 		sessionToken,
+		base64Token,
 	)
 	if err != nil {
 		return nil, err

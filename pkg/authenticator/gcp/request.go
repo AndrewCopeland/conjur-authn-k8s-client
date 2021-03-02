@@ -10,7 +10,7 @@ import (
 )
 
 // AuthenticateRequest sends an authenticate request
-func AuthenticateRequest(applianceURL string, account string, sessionToken []byte) (*http.Request, error) {
+func AuthenticateRequest(applianceURL string, account string, sessionToken []byte, base64Token bool) (*http.Request, error) {
 	var authenticateURL string
 	var err error
 	var req *http.Request
@@ -25,6 +25,9 @@ func AuthenticateRequest(applianceURL string, account string, sessionToken []byt
 	}
 
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	if base64Token {
+		req.Header.Set("Accept-Encoding", "base64")
+	}
 
 	return req, nil
 }

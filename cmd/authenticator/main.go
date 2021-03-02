@@ -34,7 +34,7 @@ func main() {
 		for {
 			err := authn.Authenticate()
 			if err != nil {
-				return log.RecordedError(log.CAKC016 + "| Error Message: " + err.Error())
+				return log.RecordedError(log.CAKC016)
 			}
 
 			if authn.GlobalConfig().ContainerMode == "init" {
