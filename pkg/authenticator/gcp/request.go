@@ -40,7 +40,7 @@ func MetadataRequest(account string, username string) (*http.Request, error) {
 	metadataURL := fmt.Sprintf("%s?audience=%s&format=full", metadataIdentityURL, audience)
 	log.Debug(log.CAKC046, metadataURL)
 
-	if req, err = http.NewRequest("GET", metadataIdentityURL, nil); err != nil {
+	if req, err = http.NewRequest("GET", metadataURL, nil); err != nil {
 		return nil, log.RecordedError(log.CAKC023, err)
 	}
 
