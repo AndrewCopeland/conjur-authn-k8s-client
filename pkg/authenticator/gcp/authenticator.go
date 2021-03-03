@@ -8,10 +8,16 @@ import (
 
 	"github.com/cyberark/conjur-authn-k8s-client/pkg/access_token"
 	"github.com/cyberark/conjur-authn-k8s-client/pkg/access_token/file"
+	"github.com/cyberark/conjur-authn-k8s-client/pkg/authenticator/common"
 	authnConfig "github.com/cyberark/conjur-authn-k8s-client/pkg/authenticator/gcp/config"
 	"github.com/cyberark/conjur-authn-k8s-client/pkg/config"
 	"github.com/cyberark/conjur-authn-k8s-client/pkg/log"
 	"github.com/cyberark/conjur-authn-k8s-client/pkg/utils"
+)
+
+const (
+	// AuthnType is gcp for google cloud authentication
+	AuthnType = "gcp"
 )
 
 // Authenticator contains the configuration and client
@@ -21,6 +27,35 @@ type Authenticator struct {
 	AccessToken access_token.AccessToken
 	Config      authnConfig.Config
 	PublicCert  *x509.Certificate
+}
+
+// GlobalConfig returns config used in the cmd package
+func (auth *Authenticator) GlobalConfig() config.Config {
+	return config.Config{
+		TokenRefreshTimeout: auth.Config.TokenRefreshTimeout,
+		ContainerMode:       auth.Config.ContainerMode,
+	}
+}
+
+// Init returns config used in the cmd package
+func (auth *Authenticator) Init() (common.Authenticator, string) {
+	log.Debug(log.CAKC059)
+	config, err := authnConfig.NewFromEnv()
+	if err != nil {
+		return nil, log.CAKC018
+	}
+
+	authn, err := New(*config)
+	if err != nil {
+		return nil, log.CAKC019
+	}
+
+	return authn, ""
+}
+
+// CanHandle returns true if provided string is 'gcp'
+func (auth *Authenticator) CanHandle(authnType string) bool {
+	return strings.ToLower(authnType) == AuthnType
 }
 
 // New creates a new authenticator instance from a token file
@@ -131,12 +166,4 @@ func (auth *Authenticator) sendMetadataRequest() ([]byte, error) {
 	}
 
 	return utils.ReadResponseBody(resp)
-}
-
-// GlobalConfig returns config used in the cmd package
-func (auth *Authenticator) GlobalConfig() config.Config {
-	return config.Config{
-		TokenRefreshTimeout: auth.Config.TokenRefreshTimeout,
-		ContainerMode:       auth.Config.ContainerMode,
-	}
 }

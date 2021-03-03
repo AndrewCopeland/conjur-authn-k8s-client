@@ -14,16 +14,23 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/fullsailor/pkcs7"
 
 	"github.com/cyberark/conjur-authn-k8s-client/pkg/access_token"
 	"github.com/cyberark/conjur-authn-k8s-client/pkg/access_token/file"
+	"github.com/cyberark/conjur-authn-k8s-client/pkg/authenticator/common"
 	authnConfig "github.com/cyberark/conjur-authn-k8s-client/pkg/authenticator/k8s/config"
 	"github.com/cyberark/conjur-authn-k8s-client/pkg/config"
 	"github.com/cyberark/conjur-authn-k8s-client/pkg/log"
 	"github.com/cyberark/conjur-authn-k8s-client/pkg/utils"
+)
+
+const (
+	// AuthnType is k8s for kubernetes authentication
+	AuthnType = "k8s"
 )
 
 var oidExtensionSubjectAltName = asn1.ObjectIdentifier{2, 5, 29, 17}
@@ -45,6 +52,35 @@ const (
 	nameTypeURI   = 6
 	nameTypeIP    = 7
 )
+
+// GlobalConfig returns config used in the cmd package
+func (auth *Authenticator) GlobalConfig() config.Config {
+	return config.Config{
+		TokenRefreshTimeout: auth.Config.TokenRefreshTimeout,
+		ContainerMode:       auth.Config.ContainerMode,
+	}
+}
+
+// Init the authenticator struct
+func (auth *Authenticator) Init() (common.Authenticator, string) {
+	log.Debug(log.CAKC058)
+	config, err := authnConfig.NewFromEnv()
+	if err != nil {
+		return nil, log.CAKC018
+	}
+
+	authn, err := New(*config)
+	if err != nil {
+		return nil, log.CAKC019
+	}
+
+	return authn, ""
+}
+
+// CanHandle returns true if provided string is 'AuthnType'
+func (auth *Authenticator) CanHandle(authnType string) bool {
+	return strings.ToLower(authnType) == AuthnType
+}
 
 // New creates a new authenticator instance from a token file
 func New(config authnConfig.Config) (*Authenticator, error) {
@@ -381,12 +417,4 @@ func consumeInjectClientCertError(path string) string {
 	}
 
 	return string(content)
-}
-
-// GlobalConfig returns config used in the cmd package
-func (auth *Authenticator) GlobalConfig() config.Config {
-	return config.Config{
-		TokenRefreshTimeout: auth.Config.TokenRefreshTimeout,
-		ContainerMode:       auth.Config.ContainerMode,
-	}
 }

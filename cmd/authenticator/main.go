@@ -8,7 +8,6 @@ import (
 	"github.com/cenkalti/backoff"
 
 	"github.com/cyberark/conjur-authn-k8s-client/pkg/authenticator"
-	"github.com/cyberark/conjur-authn-k8s-client/pkg/factory"
 	"github.com/cyberark/conjur-authn-k8s-client/pkg/log"
 )
 
@@ -17,7 +16,7 @@ func main() {
 
 	var err error
 
-	authn, errMsg := factory.NewAuthenticatorFromEnv()
+	authn, errMsg := authenticator.NewAuthenticatorFromEnv()
 	if errMsg != "" {
 		printErrorAndExit(errMsg)
 	}
